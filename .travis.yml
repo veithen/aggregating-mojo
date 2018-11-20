@@ -1,0 +1,21 @@
+dist: trusty
+language: java
+jdk:
+  - openjdk8
+  - openjdk9
+  - openjdk10
+  - openjdk11
+before_install: if [ -e $JAVA_HOME/lib/security/cacerts ]; then ln -sf /etc/ssl/certs/java/cacerts $JAVA_HOME/lib/security/cacerts; fi
+install: true
+script: mvn -B -s .travis-settings.xml -Prelease -Dgpg.skip=true verify
+before_cache: "find $HOME/.m2 -name '*-SNAPSHOT' -a -type d -print0 | xargs -0 rm -rf"
+jobs:
+  include:
+    - if: repo = "veithen/aggregating-mojo" AND branch = master AND type = push
+      stage: deploy
+      script: mvn -B -s .travis-settings.xml -Prelease -Dgpg.skip=true -DskipTests=true deploy
+      env:
+        - secure: "ZiZuM750VOGwOit9rJmvl5zwpcLVK1an7OQmyGLFdRjv6zgss0ouNYgqSgnu/POTdiVS4gw/RJqgOXMKAPopKgUcCCzLYjqjMgbAahcStYM8s1b6/092760DHyurd09HgAVJEAiXpDVvnf6VuQnYaW7F3NuIzv+ae0BE11ZrMO4UFcb1phR5wTBuec8EC1Z2irUfldXmDmG6TTDAuWx0gYK5ooia13q9/Gg3UEOsxjdaJ0Xe3V96ZGVwvNDEpz/10djwn/WmKalPzXoiEFqydVd9aXiW0DE7KMX3xOvj/INCyXw8v6nKPnjUiGSmJ74n22N29DDk0JWi8CaDBGkNzizWxbQ0xIbd5KbryOV8NO0lLp21HRYDi02yZNPjDI9pJB9o3KxwjnqMv36120v86HMk8RM92/hMwothtggSbddOc5GsWK6g0gmpwbhYrzLyKBWwDuIteHtKvqD/bDjpwU0+mOgX8ujtYs8z4FNva+H6iR2nh5BU2HFn9TPNEXi5pF0Cd9i5uJ/Er/cYENQq2m9VLvL+zOyA1kWSdpx5mBgUEkiR4YRzluTrVRuqmCSmPblZ4DOboxHUMmxmZlyo7J93cJQRWbpdMKUcdQ9bMpLwPqPs5G6png7FPANgcUnM1126X2B9wyZXkoF9MtOuc+HcDzCrAfo14++qEZZBWXU="
+cache:
+  directories:
+    - $HOME/.m2
