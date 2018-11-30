@@ -40,10 +40,10 @@ public abstract class AggregatingMojo<T extends Serializable> extends AbstractMo
     @Parameter(property="project", readonly=true, required=true)
     protected MavenProject project;
 
-    @Parameter(defaultValue="${session}", readonly=true, required=true)
+    @Parameter(property="session", readonly=true, required=true)
     protected MavenSession mavenSession;
 
-    @Parameter(defaultValue="${mojoExecution}", readonly=true, required=true)
+    @Parameter(property="mojoExecution", readonly=true, required=true)
     protected MojoExecution mojoExecution;
 
     public AggregatingMojo(Class<T> resultType) {
