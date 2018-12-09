@@ -29,7 +29,7 @@
 
     <groupId>com.github.veithen.maven.shared</groupId>
     <artifactId>aggregating-mojo</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
 
     <url>https://github.com/veithen/aggregating-mojo</url>
@@ -46,7 +46,7 @@
         <url>https://github.com/veithen/aggregating-mojo/tree/master</url>
         <connection>scm:git:http://github.com/veithen/aggregating-mojo.git</connection>
         <developerConnection>scm:git:https://github.com/veithen/aggregating-mojo.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>0.1.0</tag>
     </scm>
 
     <properties>
