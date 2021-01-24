@@ -51,6 +51,7 @@ final class Aggregator {
         serializedResults = new ArrayList<>(executionKeys.size());
     }
 
+    @SuppressWarnings("BanSerializableRead")
     List<Serializable> addResult(
             ExecutionKey executionKey, Serializable result, ClassLoader classLoader)
             throws IOException, ClassNotFoundException {
