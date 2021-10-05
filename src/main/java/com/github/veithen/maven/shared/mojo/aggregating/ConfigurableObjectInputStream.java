@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package com.github.veithen.maven.shared.mojo.aggregating.helper;
+package com.github.veithen.maven.shared.mojo.aggregating;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -19,20 +19,24 @@
  */
 package com.github.veithen.maven.shared.mojo.aggregating;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-
-import com.github.veithen.rbeans.RBeanFactoryException;
 
 public abstract class AggregatingMojo<T extends Serializable> extends AbstractMojo {
     private final Class<T> resultType;
@@ -50,28 +54,87 @@ public abstract class AggregatingMojo<T extends Serializable> extends AbstractMo
         this.resultType = resultType;
     }
 
+    private String getContextKey(String executionId) {
+        return AggregatingMojo.class.getName()
+                + ":"
+                + mojoExecution.getPlugin().getId()
+                + ":"
+                + mojoExecution.getGoal()
+                + ":"
+                + executionId;
+    }
+
     @Override
     public final void execute() throws MojoExecutionException, MojoFailureException {
-        AggregationHelper aggregationHelper;
-        try {
-            aggregationHelper = AggregationHelperFactory.getAggregationHelper();
-        } catch (RBeanFactoryException | IOException ex) {
-            throw new MojoFailureException(ex.getMessage(), ex);
+        MavenProject topLevelProject = mavenSession.getTopLevelProject();
+        Object lock;
+        synchronized (topLevelProject) {
+            String key = getContextKey("__lock__");
+            lock = topLevelProject.getContextValue(key);
+            if (lock == null) {
+                lock = new Object();
+                topLevelProject.setContextValue(key, lock);
+            }
         }
-        Serializable result = doExecute();
-        List<Serializable> results;
+
+        byte[] currentSerializedResult;
         try {
-            results =
-                    aggregationHelper.addResult(
-                            project,
-                            mavenSession,
-                            mojoExecution,
-                            result,
-                            getClass().getClassLoader());
-        } catch (ClassNotFoundException | IOException ex) {
-            throw new MojoFailureException("Failed to serialize/deserialize Mojo results", ex);
+            Serializable currentResult = doExecute();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(currentResult);
+            oos.close();
+            currentSerializedResult = baos.toByteArray();
+        } catch (IOException ex) {
+            throw new MojoFailureException("Failed to serialize Mojo results", ex);
         }
-        if (results != null) {
+
+        boolean isLast = true;
+        List<byte[]> serializedResults = new ArrayList<>();
+        synchronized (lock) {
+            synchronized (project) {
+                project.setContextValue(
+                        getContextKey(mojoExecution.getExecutionId()), currentSerializedResult);
+            }
+            outer:
+            for (MavenProject project : mavenSession.getProjects()) {
+                for (Plugin plugin : project.getBuildPlugins()) {
+                    if (plugin.getId().equals(mojoExecution.getPlugin().getId())) {
+                        for (PluginExecution execution : plugin.getExecutions()) {
+                            if (execution.getGoals().contains(mojoExecution.getGoal())) {
+                                byte[] result;
+                                synchronized (project) {
+                                    result =
+                                            (byte[])
+                                                    project.getContextValue(
+                                                            getContextKey(execution.getId()));
+                                }
+                                if (result == null) {
+                                    isLast = false;
+                                    break outer;
+                                }
+                                serializedResults.add(result);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (isLast) {
+            List<Serializable> results = new ArrayList<>(serializedResults.size());
+            for (byte[] serializedResult : serializedResults) {
+                try {
+                    results.add(
+                            (Serializable)
+                                    new ConfigurableObjectInputStream(
+                                                    new ByteArrayInputStream(serializedResult),
+                                                    getClass().getClassLoader())
+                                            .readObject());
+                } catch (ClassNotFoundException | IOException ex) {
+                    throw new MojoFailureException("Failed to deserialize Mojo results", ex);
+                }
+            }
             doAggregate(results.stream().map(resultType::cast).collect(Collectors.toList()));
         }
     }
