@@ -78,15 +78,19 @@ public abstract class AggregatingMojo<T extends Serializable> extends AbstractMo
         }
 
         byte[] currentSerializedResult;
-        try {
-            Serializable currentResult = doExecute();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(currentResult);
-            oos.close();
-            currentSerializedResult = baos.toByteArray();
-        } catch (IOException ex) {
-            throw new MojoFailureException("Failed to serialize Mojo results", ex);
+        Serializable currentResult = doExecute();
+        if (currentResult == null) {
+            currentSerializedResult = new byte[0];
+        } else {
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos);
+                oos.writeObject(currentResult);
+                oos.close();
+                currentSerializedResult = baos.toByteArray();
+            } catch (IOException ex) {
+                throw new MojoFailureException("Failed to serialize Mojo results", ex);
+            }
         }
 
         boolean isLast = true;
@@ -113,7 +117,9 @@ public abstract class AggregatingMojo<T extends Serializable> extends AbstractMo
                                     isLast = false;
                                     break outer;
                                 }
-                                serializedResults.add(result);
+                                if (result.length != 0) {
+                                    serializedResults.add(result);
+                                }
                             }
                         }
                     }
