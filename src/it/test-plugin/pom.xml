@@ -71,6 +71,7 @@
             <plugin>
                 <groupId>com.github.veithen.maven</groupId>
                 <artifactId>resolver-proxy-maven-plugin</artifactId>
+                <version>0.3.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -82,6 +83,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-invoker-plugin</artifactId>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <goals>
