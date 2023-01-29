@@ -12,3 +12,7 @@ updates:
     directory: "/src/it/test-plugin/src/it/multi-module"
     schedule:
       interval: "daily"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
