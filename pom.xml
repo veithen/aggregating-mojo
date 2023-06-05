@@ -29,7 +29,7 @@
 
     <groupId>com.github.veithen.maven.shared</groupId>
     <artifactId>aggregating-mojo</artifactId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <url>https://github.com/veithen/aggregating-mojo</url>
@@ -51,7 +51,7 @@
 
     <properties>
         <github.repository>aggregating-mojo</github.repository>
-        <javaVersion>1.8</javaVersion>
+        <javaVersion>11</javaVersion>
         <project.build.outputTimestamp>2022-01-23T12:37:00Z</project.build.outputTimestamp>
         <maven.version>3.9.2</maven.version>
     </properties>
