@@ -22,12 +22,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>test</groupId>
-    <artifactId>test-plugin</artifactId>
+    <artifactId>test-maven-plugin</artifactId>
     <version>1</version>
     <packaging>maven-plugin</packaging>
 
     <properties>
-        <maven-plugin-tools.version>3.10.2</maven-plugin-tools.version>
+        <maven-plugin-tools.version>3.11.0</maven-plugin-tools.version>
     </properties>
 
     <dependencies>
