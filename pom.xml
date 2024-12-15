@@ -129,7 +129,6 @@
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <projectName>aggregating-mojo</projectName>
-                    <licenseName>apache_v2</licenseName>
                 </configuration>
             </plugin>
         </plugins>
