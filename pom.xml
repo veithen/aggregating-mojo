@@ -32,6 +32,7 @@
     <version>0.3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <name>aggregating-mojo</name>
     <url>https://github.com/veithen/aggregating-mojo</url>
     <inceptionYear>2018</inceptionYear>
     <licenses>
