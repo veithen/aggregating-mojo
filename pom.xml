@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.github.veithen</groupId>
         <artifactId>parent</artifactId>
-        <version>55</version>
+        <version>56</version>
     </parent>
 
     <groupId>com.github.veithen.maven.shared</groupId>
@@ -88,15 +88,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.github.veithen.maven</groupId>
-                <artifactId>hermetic-maven-plugin</artifactId>
-                <configuration>
-                    <safeMethods>
-                        <safeMethod>org.apache.maven.shared.invoker.DefaultInvoker.execute</safeMethod>
-                    </safeMethods>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>com.github.veithen.maven</groupId>
                 <artifactId>resolver-proxy-maven-plugin</artifactId>
